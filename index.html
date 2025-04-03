@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canadian Reverse Income Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            margin: 0;
+            padding: 10px; /* Reduced padding */
+        }
+        h1 {
+            text-align: center;
+            color: #c8102e; /* Canadian Red */
+            font-size: 24px; /* Reduced font size */
+            line-height: 1.2; /* Adjust line height for better spacing */
+        }
+        .container {
+            max-width: 500px; /* Reduced max width */
+            margin: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px; /* Reduced padding */
+        }
+        label {
+            display: block;
+            margin: 5px 0; /* Reduced margin */
+        }
+        input, select, button {
+            margin-bottom: 10px; /* Reduced margin */
+            padding: 8px; /* Reduced padding */
+            width: 100%; /* Set all elements to take full width */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px; /* Slightly smaller font size */
+            box-sizing: border-box; /* Include padding and border in width */
+        }
+        input[type="number"] {
+            /* Specific styles for number input */
+            appearance: none; /* Remove default styling */
+        }
+        button {
+            background-color: #c8102e; /* Canadian Red */
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #a60f24; /* Darker Red on hover */
+        }
+        .deductions-container {
+            margin: 15px 0; /* Reduced margin */
+            padding: 10px; /* Reduced padding */
+            border: 2px solid #c8102e; /* Canadian Red border */
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        }
+        .deductions-container h3 {
+            margin: 0 0 5px; /* Reduced margin */
+            font-size: 16px; /* Slightly smaller font size */
+        }
+        .toggle {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px; /* Reduced margin */
+            cursor: pointer;
+        }
+        .toggle-label {
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            background-color: #ccc;
+            border-radius: 12px;
+            position: relative;
+            margin-right: 10px;
+            transition: background-color 0.3s;
+        }
+        .toggle-label:after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+        input:checked + .toggle-label {
+            background-color: #c8102e; /* Canadian Red when checked */
+        }
+        input:checked + .toggle-label:after {
+            transform: translateX(26px); /* Move the toggle */
+        }
+        input[type="checkbox"] {
+            display: none; /* Hide only the checkboxes */
+        }
+        #results {
+            display: none; /* Initially hidden */
+            margin-top: 15px; /* Reduced margin */
+            opacity: 0; /* Start with opacity 0 for fade-in effect */
+            transition: opacity 0.5s ease; /* Smooth transition for opacity */
+        }
+        #results.show {
+            display: block; /* Show the results */
+            opacity: 1; /* Fade in */
+        }
+        #results h2 {
+            text-align: center;
+            color: #c8102e; /* Canadian Red */
+            margin-bottom: 10px; /* Reduced margin */
+            font-size: 20px; /* Increased font size for emphasis */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px; /* Reduced margin */
+            border: 2px solid #c8102e; /* Canadian Red border */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        }
+        th, td {
+            padding: 12px; /* Increased padding for better spacing */
+            text-align: center; /* Center the text */
+        }
+        th {
+            background-color: #c8102e; /* Canadian Red */
+            color: white;
+            font-weight: bold;
+        }
+        td {
+            background-color: #ffffff; /* White background for table cells */
+            color: #333; /* Dark text for readability */
+            transition: background-color 0.3s ease; /* Smooth transition for background color */
+        }
+        tr:hover td {
+            background-color: #f1f1f1; /* Light gray on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Canadian Reverse Income Calculator</h1>
+        
+        <label for="netPay">Net Pay:</label>
+        <input type="number" id="netPay" placeholder="Enter your net pay" required min="0" step="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+
+        <label for="frequency">Frequency:</label>
+        <select id="frequency">
+            <option value="annually">Annually</option>
+            <option value="monthly">Monthly</option>
+            <option value="semi-monthly">Semi-Monthly</option>
+            <option value="bi-weekly">Bi-Weekly</option>
+            <option value="weekly">Weekly</option>
+        </select>
+
+        <label for="province">Province/Territory:</label>
+        <select id="province">
+            <option value="Alberta">Alberta</option>
+            <option value="British Columbia">British Columbia</option>
+            <option value="Manitoba">Manitoba</option>
+            <option value="New Brunswick">New Brunswick</option>
+            <option value="Newfoundland & Labrador">Newfoundland & Labrador</option>
+            <option value="Nova Scotia">Nova Scotia</option>
+            <option value="Ontario">Ontario</option>
+            <option value="Prince Edward Island">Prince Edward Island</option>
+            <option value="Quebec">Quebec</option>
+            <option value="Saskatchewan">Saskatchewan</option>
+            <option value="Northwest Territories">Northwest Territories</option>
+            <option value="Nunavut">Nunavut</option>
+            <option value="Yukon">Yukon</option>
+        </select>
+
+        <div class="deductions-container">
+            <h3>Include Deductions:</h3>
+            <label class="toggle">
+                <input type="checkbox" id="ei" checked style="display: none;">
+                <span class="toggle-label"></span>
+                Employment Insurance (EI)
+            </label>
+            <label class="toggle">
+                <input type="checkbox" id="cpp" checked style="display: none;">
+                <span class="toggle-label"></span>
+                Canada Pension Plan (CPP)
+            </label>
+            <label class="toggle">
+                <input type="checkbox" id="cpp2" style="display: none;">
+                <span class="toggle-label"></span>
+                Additional Canada Pension Plan (CPP2)
+            </label>
+        </div>
+
+        <button id="calculateButton">Calculate Gross Yearly Salary</button>
+
+        <h2 style="display: none;">Results</h2>
+        <div id="results">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Gross Yearly Salary</th>
+                        <th>Effective Tax Rate</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody">
+                    <!-- Results will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Function shells with updated definitions
+        function incomeTaxReverseCalculation(estimatedGrossYearlySalary, province) {
+            // Federal tax brackets and rates
+            const federalBrackets = [
+                { threshold: 57375, rate: 0.15 },
+                { threshold: 114750, rate: 0.205 },
+                { threshold: 177882, rate: 0.26 },
+                { threshold: 253414, rate: 0.29 },
+                { threshold: Infinity, rate: 0.33 }
+            ];
+
+            // Provincial tax brackets and rates
+            const provincialBrackets = {
+                'Newfoundland and Labrador': [
+                    { threshold: 44192, rate: 0.087 },
+                    { threshold: 88382, rate: 0.145 },
+                    { threshold: 157792, rate: 0.158 },
+                    { threshold: 220910, rate: 0.178 },
+                    { threshold: 282214, rate: 0.198 },
+                    { threshold: 564429, rate: 0.208 },
+                    { threshold: 1128858, rate: 0.213 },
+                    { threshold: Infinity, rate: 0.218 }
+                ],
+                'Prince Edward Island': [
+                    { threshold: 33328, rate: 0.095 },
+                    { threshold: 64656, rate: 0.1347 },
+                    { threshold: 105000, rate: 0.166 },
+                    { threshold: 140000, rate: 0.1762 },
+                    { threshold: Infinity, rate: 0.19 }
+                ],
+                'Nova Scotia': [
+                    { threshold: 30507, rate: 0.0879 },
+                    { threshold: 61015, rate: 0.1495 },
+                    { threshold: 95883, rate: 0.1667 },
+                    { threshold: 154650, rate: 0.175 },
+                    { threshold: Infinity, rate: 0.21 }
+                ],
+                'New Brunswick': [
+                    { threshold: 51306, rate: 0.094 },
+                    { threshold: 102614, rate: 0.14 },
+                    { threshold: 190060, rate: 0.16 },
+                    { threshold: Infinity, rate: 0.195 }
+                ],
+                'Ontario': [
+                    { threshold: 52886, rate: 0.0505 },
+                    { threshold: 105775, rate: 0.0915 },
+                    { threshold: 150000, rate: 0.1116 },
+                    { threshold: 220000, rate: 0.1216 },
+                    { threshold: Infinity, rate: 0.1316 }
+                ],
+                'Manitoba': [
+                    { threshold: 47564, rate: 0.108 },
+                    { threshold: 101200, rate: 0.1275 },
+                    { threshold: Infinity, rate: 0.174 }
+                ],
+                'Saskatchewan': [
+                    { threshold: 53463, rate: 0.105 },
+                    { threshold: 152750, rate: 0.125 },
+                    { threshold: Infinity, rate: 0.145 }
+                ],
+                'Alberta': [
+                    { threshold: 151234, rate: 0.10 },
+                    { threshold: 181481, rate: 0.12 },
+                    { threshold: 241974, rate: 0.13 },
+                    { threshold: 362961, rate: 0.14 },
+                    { threshold: Infinity, rate: 0.15 }
+                ],
+                'British Columbia': [
+                    { threshold: 49279, rate: 0.0506 },
+                    { threshold: 98560, rate: 0.077 },
+                    { threshold: 113158, rate: 0.105 },
+                    { threshold: 137407, rate: 0.1229 },
+                    { threshold: 186306, rate: 0.147 },
+                    { threshold: 259829, rate: 0.168 },
+                    { threshold: Infinity, rate: 0.205 }
+                ],
+                'Yukon': [
+                    { threshold: 57375, rate: 0.064 },
+                    { threshold: 114750, rate: 0.09 },
+                    { threshold: 177882, rate: 0.109 },
+                    { threshold: 500000, rate: 0.128 },
+                    { threshold: Infinity, rate: 0.15 }
+                ],
+                'Northwest Territories': [
+                    { threshold: 51964, rate: 0.059 },
+                    { threshold: 103930, rate: 0.086 },
+                    { threshold: 168967, rate: 0.122 },
+                    { threshold: Infinity, rate: 0.1405 }
+                ],
+                'Nunavut': [
+                    { threshold: 54707, rate: 0.04 },
+                    { threshold: 109413, rate: 0.07 },
+                    { threshold: 177881, rate: 0.09 },
+                    { threshold: Infinity, rate: 0.115 }
+                ],
+                'Quebec': [
+                    { threshold: 53255, rate: 0.14 },
+                    { threshold: 106495, rate: 0.19 },
+                    { threshold: 129590, rate: 0.24 },
+                    { threshold: Infinity, rate: 0.2575 }
+                ]
+            };
+
+            // Calculate federal tax
+            let totalIncomeTax = 0;
+
+            // Federal tax calculation
+            let remainingIncome = estimatedGrossYearlySalary;
+            for (const bracket of federalBrackets) {
+                if (remainingIncome > bracket.threshold) {
+                    totalIncomeTax += bracket.threshold * bracket.rate;
+                    remainingIncome -= bracket.threshold;
+                } else {
+                    totalIncomeTax += remainingIncome * bracket.rate;
+                    break;
+                }
+            }
+
+            // Provincial tax calculation
+            if (provincialBrackets[province]) {
+                remainingIncome = estimatedGrossYearlySalary;
+                for (const bracket of provincialBrackets[province]) {
+                    if (remainingIncome > bracket.threshold) {
+                        totalIncomeTax += bracket.threshold * bracket.rate;
+                        remainingIncome -= bracket.threshold;
+                    } else {
+                        totalIncomeTax += remainingIncome * bracket.rate;
+                        break;
+                    }
+                }
+            }
+
+            // Calculate effective tax rate
+            const effectiveTaxRate = totalIncomeTax / estimatedGrossYearlySalary;
+
+            return {
+                totalIncomeTax,
+                effectiveTaxRate
+            };
+        }
+
+        function eiDeductionCalculation(estimatedGrossYearlySalary) {
+            const eiRate = 0.0163; // EI deduction rate
+            const eiMax = 1077; // Maximum EI deduction
+
+            // Calculate the total EI based on the salary
+            const totalEI = Math.min(estimatedGrossYearlySalary * eiRate, eiMax);
+
+            return {
+                totalEI
+            };
+        }
+
+        function cppDeductionCalculation(estimatedGrossYearlySalary) {
+            const cppRate = 0.0595; // CPP deduction rate
+            const cppMax = 4034; // Maximum CPP deduction
+
+            // Calculate the total CPP based on the salary
+            const totalCPP = Math.min(estimatedGrossYearlySalary * cppRate, cppMax);
+
+            return {
+                totalCPP
+            };
+        }
+
+        function cpp2DeductionCalculation(estimatedGrossYearlySalary) {
+            const cpp2Rate = 0.04; // CPP2 deduction rate
+            const cpp2Max = 396; // Maximum CPP2 deduction
+
+            // Calculate the total CPP2 based on the salary
+            const totalCPP2 = Math.min(estimatedGrossYearlySalary * cpp2Rate, cpp2Max);
+
+            return {
+                totalCPP2
+            };
+        }
+
+        function grossYearlySalaryCalculation(netPay, frequency, province, eiEnabled, cppEnabled, cpp2Enabled) {
+            // Determine the number of pay periods per year based on frequency
+            const payPeriods = {
+                annually: 1,
+                monthly: 12,
+                'semi-monthly': 24,
+                'bi-weekly': 26,
+                weekly: 52
+            };
+            
+            const yearlyNetPay = netPay * payPeriods[frequency];
+
+            // Initialize variables for deductions
+            let totalEI = 0;
+            let totalCPP = 0;
+            let totalCPP2 = 0;
+            let totalIncomeTax = yearlyNetPay / 0.35; // Starting estimate for income tax
+            let grossYearlySalary = yearlyNetPay + totalIncomeTax; // Initial guess
+
+            // Binary search to find the correct gross yearly salary
+            let lowerBound = yearlyNetPay; // Minimum gross salary
+            let upperBound = yearlyNetPay * 2; // Arbitrary upper limit for search
+            let iterations = 0;
+
+            while (iterations < 1000) { // Limit iterations to prevent infinite loops
+                grossYearlySalary = (lowerBound + upperBound) / 2;
+
+                // Calculate deductions using the existing functions only if toggles are enabled
+                if (eiEnabled) {
+                    totalEI = eiDeductionCalculation(grossYearlySalary).totalEI;
+                } else {
+                    totalEI = 0;
+                }
+
+                if (cppEnabled) {
+                    totalCPP = cppDeductionCalculation(grossYearlySalary).totalCPP;
+                } else {
+                    totalCPP = 0;
+                }
+
+                if (cpp2Enabled) {
+                    totalCPP2 = cpp2DeductionCalculation(grossYearlySalary).totalCPP2;
+                } else {
+                    totalCPP2 = 0;
+                }
+
+                totalIncomeTax = incomeTaxReverseCalculation(grossYearlySalary, province).totalIncomeTax; // Assuming this function is updated to take gross salary
+
+                // Calculate the effective net pay after deductions
+                const effectiveNetPay = grossYearlySalary - totalIncomeTax - totalEI - totalCPP - totalCPP2;
+
+                if (Math.abs(effectiveNetPay - yearlyNetPay) < 1) { // Updated threshold to 1
+                    // If the effective net pay is close enough to the target, break the loop
+                    break;
+                } else if (effectiveNetPay < yearlyNetPay) {
+                    // If effective net pay is less than target, increase gross salary
+                    lowerBound = grossYearlySalary;
+                } else {
+                    // If effective net pay is more than target, decrease gross salary
+                    upperBound = grossYearlySalary;
+                }
+
+                iterations++;
+            }
+
+            // Log the number of iterations taken
+            console.log(`Iterations taken to find gross yearly salary: ${iterations}`);
+
+            return {
+                grossYearlySalary,
+                effectiveTaxRate: totalIncomeTax / grossYearlySalary // Calculate effective tax rate
+            };
+        }
+
+        // Event listener for the calculate button
+        document.getElementById('calculateButton').addEventListener('click', function() {
+            const netPay = parseInt(document.getElementById('netPay').value);
+            const frequency = document.getElementById('frequency').value;
+            const province = document.getElementById('province').value;
+            const eiEnabled = document.getElementById('ei').checked;
+            const cppEnabled = document.getElementById('cpp').checked;
+            const cpp2Enabled = document.getElementById('cpp2').checked;
+
+            // Call the gross salary calculation function
+            const result = grossYearlySalaryCalculation(netPay, frequency, province, eiEnabled, cppEnabled, cpp2Enabled);
+
+            // Format the results
+            const formattedGrossYearlySalary = result.grossYearlySalary.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            const formattedEffectiveTaxRate = (result.effectiveTaxRate * 100).toFixed(2) + '%';
+
+            // Populate results in the table
+            const resultsBody = document.getElementById('resultsBody');
+            resultsBody.innerHTML = `
+                <tr>
+                    <td>${formattedGrossYearlySalary}</td>
+                    <td>${formattedEffectiveTaxRate}</td>
+                </tr>
+            `;
+
+            // Show results with fade-in effect
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.style.display = 'block'; // Ensure the results div is displayed
+            setTimeout(() => {
+                resultsDiv.classList.add('show'); // Add the show class for fade-in
+            }, 10); // Small timeout to allow display to take effect
+        });
+    </script>
+</body>
+</html>
