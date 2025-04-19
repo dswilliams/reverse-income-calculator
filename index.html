@@ -412,6 +412,37 @@
             let totalIncomeTax = yearlyNetPay / 0.35; // Starting estimate for income tax
             let grossYearlySalary = yearlyNetPay + totalIncomeTax; // Initial guess
 
+            // Define Basic Personal Amounts
+            const basicPersonalAmounts = {
+                federal: 14538,
+                Alberta: 21885,
+                "British Columbia": 12932,
+                Manitoba: 15780,
+                "New Brunswick": 12756,
+                "Newfoundland & Labrador": 10382,
+                "Nova Scotia": 11744,
+                Ontario: 12747,
+                "Prince Edward Island": 14250,
+                Quebec: 18056,
+                Saskatchewan: 18729,
+                "Northwest Territories": 16593,
+                Nunavut: 17925,
+                Yukon: 16129
+            };
+
+            // Calculate the total basic personal amount
+            const federalBPA = basicPersonalAmounts.federal;
+            const provincialBPA = basicPersonalAmounts[province] || 0; // Default to 0 if province not found
+            const totalBPA = federalBPA + provincialBPA;
+
+            // Reduce grossYearlySalary by the total basic personal amount
+            grossYearlySalary -= totalBPA;
+
+            // Ensure grossYearlySalary is not negative
+            if (grossYearlySalary < 0) {
+                grossYearlySalary = 0; // Set to 0 if it becomes negative
+            }
+
             // Binary search to find the correct gross yearly salary
             let lowerBound = yearlyNetPay; // Minimum gross salary
             let upperBound = yearlyNetPay * 2; // Arbitrary upper limit for search
@@ -439,7 +470,26 @@
                     totalCPP2 = 0;
                 }
 
-                totalIncomeTax = incomeTaxReverseCalculation(grossYearlySalary, province).totalIncomeTax; // Assuming this function is updated to take gross salary
+                // Calculate total income tax
+                totalIncomeTax = incomeTaxReverseCalculation(grossYearlySalary, province).totalIncomeTax;
+
+                // Ontario surtax calculation
+                if (province === "Ontario") {
+                    const basicProvincialTax = totalIncomeTax; // Assuming this is the basic provincial tax
+
+                    let surtax = 0;
+
+                    if (basicProvincialTax <= 5710) {
+                        surtax = 0; // No surtax
+                    } else if (basicProvincialTax > 5710 && basicProvincialTax <= 7307) {
+                        surtax = 0.20 * (basicProvincialTax - 5710); // 20% of the amount over $5,710
+                    } else {
+                        surtax = (0.20 * (7307 - 5710)) + (0.36 * (basicProvincialTax - 7307)); // 20% + 36%
+                    }
+
+                    // Add surtax to total income tax
+                    totalIncomeTax += surtax;
+                }
 
                 // Calculate the effective net pay after deductions
                 const effectiveNetPay = grossYearlySalary - totalIncomeTax - totalEI - totalCPP - totalCPP2;
